@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MorphSpot | Advanced Image Forensics & Tampering Detection Engine</title>
+  <meta name="description" content="State-of-the-art computer vision forensic engine to detect digital image manipulation, morphing, splicing, and copy-move forgery.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css?v=10">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-badge">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 3v18"/>
+          <path d="M3 12h18"/>
+          <circle cx="12" cy="12" r="4" fill="currentColor" opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Morph<span>Spot</span></h1>
+        <p class="subtitle">Multi-Spectral Digital Image Forensics</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="headerCertBtn" class="header-cert-btn" title="Download Official Forensic Examination Certificate">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>📄 Download Certificate</span>
+      </button>
+      <span class="engine-badge"><span class="pulse-dot"></span> Engine v1.0 Ready</span>
+      <a href="/docs" target="_blank" class="api-doc-link" title="OpenAPI Documentation">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        Swagger API
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <!-- Left Column: Upload & Controls -->
+    <aside class="control-panel">
+      <!-- Upload Dropzone -->
+      <section class="panel-card upload-card">
+        <h2 class="card-title">Image Ingestion</h2>
+        <div id="dropzone" class="dropzone">
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/bmp,image/tiff" class="file-input">
+          <div class="dropzone-content">
+            <div class="upload-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <p class="upload-primary">Drag & drop forensic image here</p>
+            <p class="upload-secondary">or <span class="browse-btn">Browse files</span> (JPG, PNG, WEBP)</p>
+          </div>
+        </div>
+
+        <!-- Sample Fixtures -->
+        <div class="preset-section">
+          <label class="section-label">Real-World Test Benchmarks:</label>
+          <div class="preset-buttons">
+            <button type="button" class="preset-btn" data-type="sample_dslr" title="Genuine Canon EOS 5D Mark IV Landscape">Authentic DSLR</button>
+            <button type="button" class="preset-btn" data-type="sample_iphone" title="Genuine Apple iPhone 15 Pro Portrait with Bokeh">iPhone Bokeh</button>
+            <button type="button" class="preset-btn" data-type="sample_spliced_moon" title="Composite Image with Spliced Foreign Insert">Spliced Moon</button>
+            <button type="button" class="preset-btn" data-type="sample_copymove_stamp" title="Copy-Move Cloned Stamp Pattern">Cloned Stamp</button>
+            <button type="button" class="preset-btn" data-type="sample_photoshop_skin" title="Portrait with Inpainted Skin and Photoshop Metadata">Photoshop Edit</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analysis Status & Pipeline Indicators -->
+      <section class="panel-card detectors-card">
+        <h2 class="card-title">Forensic Detectors</h2>
+        <ul class="detector-checklist">
+          <li class="detector-item" id="det-ela">
+            <span class="det-status-icon">✓</span>
+            <div class="det-info">
+              <span class="det-name">Error Level Analysis (ELA)</span>
+              <span class="det-desc">JPEG 90% recompression DCT residuals</span>
+            </div>
+          </li>
+          <li class="detector-item" id="det-noise">
+            <span class="det-status-icon">✓</span>
+            <div class="det-info">
+              <span class="det-name">Noise Inconsistency</span>
+              <span class="det-desc">Sensor high-pass residual & MAD z-score</span>
+            </div>
+          </li>
+          <li class="detector-item" id="det-copymove">
+            <span class="det-status-icon">✓</span>
+            <div class="det-info">
+              <span class="det-name">Copy-Move Forgery</span>
+              <span class="det-desc">SIFT keypoint clustering & displacement bins</span>
+            </div>
+          </li>
+          <li class="detector-item" id="det-edges">
+            <span class="det-status-icon">✓</span>
+            <div class="det-info">
+              <span class="det-name">Edge & Blending Sharpness</span>
+              <span class="det-desc">Sobel contour transitions & alpha matting</span>
+            </div>
+          </li>
+          <li class="detector-item" id="det-lum">
+            <span class="det-status-icon">✓</span>
+            <div class="det-info">
+              <span class="det-name">Luminance / Chromaticity</span>
+              <span class="det-desc">CIE-Lab 2D illumination surface fitting</span>
+            </div>
+          </li>
+          <li class="detector-item" id="det-meta">
+            <span class="det-status-icon">✓</span>
+            <div class="det-info">
+              <span class="det-name">EXIF & Metadata Audit</span>
+              <span class="det-desc">Photoshop/GIMP/AI signature detection</span>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Sidebar Download Documentation Card -->
+      <section class="panel-card export-panel-card" id="sidebarExportCard">
+        <h2 class="card-title">Audit Documentation</h2>
+        <p class="sidebar-export-desc">Generate official evidence records with SHA-256 integrity seal:</p>
+        <div class="sidebar-export-actions">
+          <button id="sidebarDownloadCertBtn" class="sidebar-btn-cert" title="Download Official Forensic Audit Certificate">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <span>Download Audit Certificate</span>
+          </button>
+          <button id="sidebarDownloadJsonBtn" class="sidebar-btn-json" title="Download Full JSON Telemetry Report">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Download JSON Data</span>
+          </button>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Right Column: Visual Inspector & Detailed Reports -->
+    <section class="results-panel">
+      <!-- Loading State -->
+      <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p class="loading-text">Executing Multi-Modal Computer Vision Analysis...</p>
+        <span class="loading-subtext">Computing DCT residuals, noise variance & keypoint descriptors</span>
+      </div>
+
+      <!-- Empty State Placeholder -->
+      <div id="emptyPlaceholder" class="empty-state">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </div>
+        <h3>No Image Analyzed Yet</h3>
+        <p>Upload a photograph or select a test preset to generate comprehensive digital tampering telemetry.</p>
+      </div>
+
+      <!-- Results View Container -->
+      <div id="resultsContainer" class="results-content hidden">
+        <!-- Verdict Banner -->
+        <div id="verdictBanner" class="verdict-banner verdict-authentic">
+          <div class="verdict-main">
+            <div class="score-circle-wrapper">
+              <svg class="score-ring" width="84" height="84">
+                <circle class="ring-bg" cx="42" cy="42" r="36"/>
+                <circle id="scoreRingProgress" class="ring-progress" cx="42" cy="42" r="36"/>
+              </svg>
+              <div class="score-number-box">
+                <span id="scorePercentVal">0%</span>
+              </div>
+            </div>
+            <div class="verdict-text-box">
+              <span class="verdict-sublabel">Manipulated Probability Score</span>
+              <h2 id="verdictLabel" class="verdict-title">Authentic / Untampered</h2>
+              <p id="verdictSummary" class="verdict-desc">Consistent compression artifacts and uniform noise residuals.</p>
+            </div>
+          </div>
+          <div class="verdict-meta">
+            <div class="meta-badge-item">
+              <span class="badge-title">Confidence</span>
+              <span id="confidenceVal" class="badge-value">High</span>
+            </div>
+            <div class="meta-badge-item">
+              <span class="badge-title">File</span>
+              <span id="filenameVal" class="badge-value">sample.jpg</span>
+            </div>
+            <button id="viewCertBtnBanner" class="cert-btn-primary" title="View & Download Official Forensic Audit Certificate">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              Audit Certificate
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Multi-Spectral Inspector -->
+        <div class="panel-card inspector-card">
+          <div class="card-header-bar">
+            <h3 class="card-title">Visual Forensic Inspector</h3>
+            <!-- Layer Tabs -->
+            <div class="layer-tabs" id="layerTabs">
+              <button class="layer-tab active" data-layer="composite">Composite Heatmap</button>
+              <button class="layer-tab" data-layer="ela">ELA</button>
+              <button class="layer-tab" data-layer="noise">Noise</button>
+              <button class="layer-tab" data-layer="copymove">Copy-Move</button>
+              <button class="layer-tab" data-layer="edges">Edges</button>
+              <button class="layer-tab" data-layer="luminance">Luminance</button>
+            </div>
+          </div>
+
+          <!-- Dual Viewer / Overlay -->
+          <div class="viewer-wrapper">
+            <div class="image-viewer-container" id="imageViewer">
+              <img id="viewOriginal" class="viewer-img original-layer" alt="Original Image">
+              <img id="viewMask" class="viewer-img mask-layer" alt="Forensic Mask">
+              <div id="wipeDivider" class="wipe-divider">
+                <div class="wipe-handle"></div>
+              </div>
+            </div>
+            <!-- Slider Controls -->
+            <div class="viewer-controls">
+              <div class="control-group">
+                <label for="opacitySlider">Overlay Opacity:</label>
+                <input type="range" id="opacitySlider" min="0" max="100" value="75" class="range-slider">
+                <span id="opacityVal">75%</span>
+              </div>
+              <div class="control-group">
+                <label>Mode:</label>
+                <div class="toggle-group">
+                  <button id="modeBlendBtn" class="toggle-btn active">Blend</button>
+                  <button id="modeSplitBtn" class="toggle-btn">Split Wipe</button>
+                  <button id="modeOriginalBtn" class="toggle-btn">Original Only</button>
+                  <button id="modeMaskBtn" class="toggle-btn">Mask Only</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Grid Breakdown (All 6 Points) -->
+        <div class="metric-grid">
+          <!-- ELA Card -->
+          <div class="metric-card" id="card-ela">
+            <div class="metric-card-header">
+              <h4>Error Level Analysis (ELA)</h4>
+              <span id="elaScoreBadge" class="score-pill">0%</span>
+            </div>
+            <p id="elaDetails" class="metric-details">Analyzing JPEG error disparity...</p>
+            <div class="metric-subtags" id="elaSubtags"></div>
+          </div>
+
+          <!-- Noise Card -->
+          <div class="metric-card" id="card-noise">
+            <div class="metric-card-header">
+              <h4>Noise Residual Inconsistency</h4>
+              <span id="noiseScoreBadge" class="score-pill">0%</span>
+            </div>
+            <p id="noiseDetails" class="metric-details">Analyzing high-pass sensor noise...</p>
+            <div class="metric-subtags" id="noiseSubtags"></div>
+          </div>
+
+          <!-- Copy-Move Card -->
+          <div class="metric-card" id="card-copymove">
+            <div class="metric-card-header">
+              <h4>Copy-Move / Clone Forgery</h4>
+              <span id="copyScoreBadge" class="score-pill">0%</span>
+            </div>
+            <p id="copyDetails" class="metric-details">Extracting invariant keypoints...</p>
+            <div class="metric-subtags" id="copySubtags"></div>
+          </div>
+
+          <!-- Edge Card -->
+          <div class="metric-card" id="card-edges">
+            <div class="metric-card-header">
+              <h4>Edge Sharpness & Blending</h4>
+              <span id="edgeScoreBadge" class="score-pill">0%</span>
+            </div>
+            <p id="edgeDetails" class="metric-details">Measuring contour gradient profiles...</p>
+            <div class="metric-subtags" id="edgeSubtags"></div>
+          </div>
+
+          <!-- Luminance Card -->
+          <div class="metric-card" id="card-luminance">
+            <div class="metric-card-header">
+              <h4>Luminance & Color Variance</h4>
+              <span id="lumScoreBadge" class="score-pill">0%</span>
+            </div>
+            <p id="lumDetails" class="metric-details">Analyzing CIE-Lab illumination gradients...</p>
+            <div class="metric-subtags" id="lumSubtags"></div>
+          </div>
+
+          <!-- Metadata Card -->
+          <div class="metric-card" id="card-meta">
+            <div class="metric-card-header">
+              <h4>Metadata & EXIF Security Audit</h4>
+              <span id="metaScoreBadge" class="score-pill">Clean</span>
+            </div>
+            <p id="metaDetails" class="metric-details">Inspecting EXIF/XMP chunks...</p>
+            <div class="meta-tags-container" id="metaTagsList"></div>
+          </div>
+        </div>
+
+        <!-- Dedicated Download & Audit Center Banner -->
+        <div class="panel-card download-center-card" id="downloadCenterBanner">
+          <div class="download-center-content">
+            <div class="download-center-text">
+              <div class="dl-badge">OFFICIAL FORENSIC RECORD & CERTIFICATE</div>
+              <h3>Download Forensic Examination Record</h3>
+              <p>Download the complete official audit record with all 6 telemetry percentage points, cryptographic SHA-256 evidence hash, visual masks, and laboratory stamp.</p>
+            </div>
+            <div class="download-center-btns">
+              <button id="bigDownloadCertBtn" class="btn-giant-cert" title="Download Official Forensic Examination Certificate">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <polyline points="9 15 12 18 15 15"/>
+                </svg>
+                <span>Download Audit Certificate (PDF / HTML)</span>
+              </button>
+              <button id="bigDownloadJsonBtn" class="btn-giant-json" title="Download Full JSON Telemetry Report">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Download JSON</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Structured JSON Report Export Section -->
+        <div class="panel-card json-card">
+          <div class="card-header-bar">
+            <h3 class="card-title">Forensic Audit & Telemetry Export</h3>
+            <div class="json-actions">
+              <button id="downloadCertBtn" class="action-btn cert-action">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <polyline points="9 15 12 18 15 15"/>
+                </svg>
+                Download Audit Certificate
+              </button>
+              <button id="copyJsonBtn" class="action-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copy JSON
+              </button>
+              <button id="downloadJsonBtn" class="action-btn primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download JSON
+              </button>
+            </div>
+          </div>
+          <pre class="json-code-box"><code id="jsonOutput">{}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Certificate Modal -->
+  <div id="certModal" class="modal-backdrop hidden">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <h3>Official Forensic Audit Certificate & Record</h3>
+        </div>
+        <div class="modal-actions">
+          <button id="certModalPrintBtn" class="modal-btn secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Print / Save as PDF
+          </button>
+          <button id="certModalDownloadBtn" class="modal-btn primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download HTML File
+          </button>
+          <button id="certModalCloseBtn" class="modal-close-btn" title="Close Modal">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <iframe id="certPreviewIframe" class="cert-iframe" title="Forensic Examination Certificate"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js?v=10"></script>
+</body>
+</html>
